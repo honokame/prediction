@@ -1,5 +1,5 @@
 #include <MsTimer2.h>
-#define smtime 0.005
+#define smtime 0.005 // サンプリング周期
 //double time = 0 ;
 
 void sample(){
