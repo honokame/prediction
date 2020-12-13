@@ -18,7 +18,7 @@ void setup()
   myPort.clear();//バッファを空にし、そこに格納されているすべてのデータを削除する。
 
   size( 400, 300); //画面サイズ
-  background(0,0,0);　//背景の色設定
+  background(0,0,0); //背景の色設定
 
   stroke( 255, 255, 255); //画面に引く線の色設定
   strokeWeight(0.5); //線の太さの設定
@@ -27,11 +27,12 @@ void setup()
   line( 0, height * 3/5, width, height * 3/5);
   line( 0, height * 4/5, width, height * 4/5);
 
-  frameRate(1000); //smtime 0.005 nara 200  [1]
+  frameRate(200); //smtime 0.005 nara 200  [1]
 
-  File desk = new File(System.getProperty("user.home"), "Desktop");
-  File newdir = new File(desk + "\\voltdata");
-  //File newdir = new File("C:\\Users\\user\\Desktop\\voltdata"); //save dir
+  //File desk = new File(System.getProperty("user.home"), "Desktop");
+  //File newdir = new File(desk + "\\voltdata");
+  //File newdir = new File("C:\\Users\\user\\research\\prediction\\voltdata"); //save dir
+  File newdir = new File("/home/honoka/research/prediction/voltdata");
   //フォルダ作成位置の指定して実体化
   newdir.mkdir();  //対象の位置にフォルダを作る
 
@@ -109,8 +110,11 @@ void keyReleased(){
 }
   else{
   i++;
-  File desk = new File(System.getProperty("user.home"), "Desktop");
-  File newdir = new File(desk + "\\voltdata");
+  //File desk = new File(System.getProperty("user.home"), "Desktop"); 
+  //File newdir = new File(desk + "research\\prediction\\voltdata");  
+  //File newdir = new File("C:\\Users\\user\\research\\prediction\\voltdata"); //save dir 
+  File newdir = new File("/home/honoka/research/prediction/voltdata");
+ 
   String zero;
   if( i < 10 ){
     zero = "00" ;
