@@ -25,11 +25,12 @@ void setup()
   line( 0, height * 3/5, width, height * 3/5);
   line( 0, height * 4/5, width, height * 4/5);
 
-  frameRate(1000); //smtime 0.005 nara 200  [1]
+  // 1秒間に何回記録を取るか、(200)ならサンプリング周期は0.005
+    frameRate(1000); 
   
   File desk = new File(System.getProperty("user.home"), "Desktop"); 
-  File newdir = new File(desk + "\\voltdata"); 
-  //File newdir = new File("C:\\Users\\user\\Desktop\\voltdata"); //save dir 
+  File newdir = new File(desk + "research\\prediction\\voltdata"); 
+  //File newdir = new File("C:\\Users\\user\\Desktop\\research\\prediction\\voltdata"); //save dir 
   newdir.mkdir();
   
   String zero ;  
