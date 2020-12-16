@@ -1,5 +1,6 @@
 #%%
 import numpy as np
+from sklearn.model_selection import train_test_split #データセットの分割
 
 #%%
 #csvファイル読み込み
@@ -28,9 +29,18 @@ for i in range(csv300.shape[0]):  #データの数
 for i in range(csv500.shape[0]):  
   data.append(csv500[i][0:length])
   target.append(0.5)
+
 for i in range(csv700.shape[0]):
   data.append(csv700[i][0:length])
   target.append(0.7)
 
+# %%
+#学習できる形に変換
+x = np.array(data)
+t = np.array(target)
+#x = np.array(data).reshape(len(data), length)
+#t = np.array(target).reshape(len(target), 1)
 
+x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=0.3)
+print(t_test.shape)
 # %%
