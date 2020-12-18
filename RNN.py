@@ -1,7 +1,9 @@
 #%%
 import numpy as np
 from sklearn.model_selection import train_test_split #データセットの分割
-
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers.core import Activation
 #%%
 #csvファイル読み込み
 #BOM付きなのでencoding="utf_8_sig"を指定
@@ -37,10 +39,20 @@ for i in range(csv700.shape[0]):
 # %%
 #学習できる形に変換
 x = np.array(data)
-t = np.array(target)
+t = np.array(target).reshape(len(target),1)
 #x = np.array(data).reshape(len(data), length)
 #t = np.array(target).reshape(len(target), 1)
 
 x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=0.3)
-print(t_test.shape)
+# %%
+#入力、隠れ、出力のユニット数
+l_in = len(x[0]) #30
+l_hidden = 30
+l_out = len(t[0])  #1
+print(len(x[0]))
+# %%
+model = Sequential()  #入力と出力が１つずつ
+model.add(Dense(l_hidden,activation='relu',input_shape=(len(x[0]),))) #隠れ層のユニット数、活性化関数、入力の形
+
+
 # %%
