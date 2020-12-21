@@ -11,9 +11,9 @@ def softmax(a):
   return y,sum(y)
 
 #%%
-a = np.array([1010,1000,990])
-print(softmax(a))
-b = np.array([0.3,2.9,4.0])
-print(softmax(b))
+a = [[1, 2], [3, 4], [5, 6]]
+b = [1, 2, 3, 4, 5, 6]
+print(a)
+print(b)
+
 # %%
-csv = np.
