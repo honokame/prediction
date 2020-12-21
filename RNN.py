@@ -1,11 +1,16 @@
 #%%
 import numpy as np
+import matplotlib.pyplot as plt
+
 from keras.utils import np_utils
 from sklearn.model_selection import train_test_split #データセットの分割
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers.core import Activation
 from keras.optimizers import Adam
+from matplotlib.backends.backend_pdf import PdfPages
+from keras.utils import plot_model
+
 
 #%%
 #csvファイル読み込み
@@ -50,19 +55,42 @@ x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=0.3)
 # %%
 #入力、隠れ、出力のユニット数
 l_in = len(x[0]) #30
-l_hidden = 30
+l_hidden = 40
 l_out = 3
 #l_out = len(t[0])  #1
 # %%
 #モデルの構築
 model = Sequential()  #入力と出力が１つずつ
-model.add(Dense(l_hidden,activation='relu',input_shape=(len(x[0]),))) #隠れ層のユニット数、活性化関数、入力の形
+model.add(Dense(l_hidden,activation='relu',input_shape=(l_in,))) #隠れ層のユニット数、活性化関数、入力の形
 model.add(Dense(l_out,activation='softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
 model.summary()
 
 # %%
 #学習の最適化
-optimizer = Adam(lr=0.001,beta_1=0.9,beta_2=0.999) #後日パラメータ調整
-model.compile(loss='categorical_crossentropy',optimizer=optimizer) #損失関数は交差エントロピー誤差
+optimizer = Adam(lr=0.01, beta_1=0.9, beta_2=0.999)  #後日パラメータ調整
+#損失関数（交差エントロピー誤差）、最適化アルゴリズム、評価関数
+model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy']) 
 
 #%%
+#学習開始
+batch_size = 32
+epochs = 100
+result = model.fit(x_train,t_train,batch_size=batch_size,epochs=epochs,validation_data=(x_test,t_test))
+# %%
+#学習結果の可視化
+pp = PdfPages('rnn_loss.pdf')
+plt.plot(range(1, epochs+1), result.history['loss'], label="training_loss")
+plt.plot(range(1, epochs+1), result.history['val_loss'], label="validation_loss")
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+pp.savefig()
+pp.close()
+
+# %%
+score_train = model.evaluate(x_train,t_train,verbose=1)
+score_test = model.evaluate(x_test,t_test,verbose=1)
+#print(accuracy)
+print(score_train)
+print(score_test)
+# %%
