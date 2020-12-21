@@ -15,9 +15,9 @@ from keras.layers import Dense
 from keras.utils import plot_model
 
 #%%
-csv_double300 = np.loadtxt("/home/honoka/research/prediction/csv/300-2.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
-csv_double500 = np.loadtxt("/home/honoka/research/prediction/csv/500-2.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
-csv_double700 = np.loadtxt("/home/honoka/research/prediction/csv/700-2.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
+csv_double300 = np.loadtxt("/home/honoka/research/prediction/csv/300.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
+csv_double500 = np.loadtxt("/home/honoka/research/prediction/csv/500.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
+csv_double700 = np.loadtxt("/home/honoka/research/prediction/csv/700.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
 
 #BOM付きCSVの場合 encoding='utf_8_sig' を指定する必要がある
 
