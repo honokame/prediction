@@ -54,6 +54,8 @@ X_valid, X_test, Y_valid, Y_test = train_test_split(X_test, Y_test, test_size=in
 n_in = len(X[0][0])
 n_hidden = 40
 n_out = len(Y[0])
+print(len(X[0][0]))
+print(len(Y[0]))
 
 #%%
 model = Sequential()
