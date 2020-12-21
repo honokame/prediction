@@ -43,7 +43,7 @@ void setup()
     } else {
       zero = "" ;
     }
-    String filepath = newdir+ "\\data" + zero+ i+".csv" ; 
+    String filepath = newdir+ "/data" + zero+ i+".csv" ; 
     File file = new File (filepath); 
     if (file.exists()){
     }
@@ -111,7 +111,7 @@ void keyReleased(){
   //File desk = new File(System.getProperty("user.home"), "Desktop"); 
   //File newdir = new File(desk + "research\\prediction\\voltdata");  
   //File newdir = new File("C:\\Users\\user\\research\\prediction\\voltdata"); //save dir 
-  File newdir = new File("/home/honoka/research/prediction/voltdata");
+  File newdir = new File("\\home\\honoka\\research\\prediction\\voltdata");
 
   String zero;
   if( i < 10 ){
@@ -121,7 +121,7 @@ void keyReleased(){
   } else {
     zero = "" ;
   }
-  String next = newdir+ "\\data" + zero+ i+".csv" ; 
+  String next = "/home/honoka/research/prediction/voltdata/data" + zero+ i+".csv" ; 
   output = createWriter(next);
   output.println("0");
   
