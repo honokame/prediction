@@ -17,8 +17,8 @@ from keras.utils import plot_model
 #csvファイル読み込み
 #BOM付きなのでencoding="utf_8_sig"を指定
 csv100 = np.loadtxt("/home/honoka/research/prediction/csv/100_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
-csv200 = np.loadtxt("/home/honoka/research/prediction/csv/200_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
-csv300 = np.loadtxt("/home/honoka/research/prediction/csv/300_1.csv", delimiter=",", encoding='utf_8_sig', unpack=True)
+csv200 = np.loadtxt("/home/honoka/research/prediction/csv/300_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
+csv300 = np.loadtxt("/home/honoka/research/prediction/csv/500_1.csv", delimiter=",", encoding='utf_8_sig', unpack=True)
 
 #時間の行を削除
 csv100 = np.delete(csv100, 0, 0)
@@ -69,14 +69,14 @@ model.summary()
 
 # %%
 #学習の最適化
-optimizer = Adam(lr=0.01, beta_1=0.9, beta_2=0.999)  #後日パラメータ調整
+optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)  #後日パラメータ調整
 #損失関数（交差エントロピー誤差）、最適化アルゴリズム、評価関数
 model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy']) 
 
 #%%
 #学習開始
 batch_size = 64
-epochs = 200
+epochs = 150
 result = model.fit(x_train,t_train, batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid))
 
 #%%
@@ -104,9 +104,25 @@ pp.savefig()
 pp.close()
 
 # %%
-score_train = model.evaluate(x_train,t_train,verbose=1)
-score_test = model.evaluate(x_test,t_test,verbose=1)
-#print(accuracy)
-print(score_train)
-print(score_test)
-# %%
+#学習モデルを用いてx_trainから予測
+score_train = model.predict(x_train)
+
+#学習モデルを用いてx_testから予測
+score_test = model.predict(x_test)
+
+#正解率を求める
+count_train = 0
+count_test = 0
+
+for i in range(len(score_train)):
+  if (np.argmax(score_train[i]) == np.argmax(t_train[i])):
+    count_train += 1
+
+for i in range(len(score_test)):
+  if (np.argmax(score_test[i]) == np.argmax(t_test[i])):
+    count_test += 1
+
+print("train_acc=")
+print(count_train / len(score_train))
+print("test_acc=")
+print(count_test / len(score_test))
