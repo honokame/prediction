@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split #データセットの分�
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import SimpleRNN
+from keras.layers import LSTM
+from keras.layers import Flatten
 from keras.layers.core import Activation
 from keras.optimizers import Adam
 from matplotlib.backends.backend_pdf import PdfPages
@@ -16,8 +18,8 @@ from keras.utils import plot_model
 #%%
 #csvファイル読み込み
 #BOM付きなのでencoding="utf_8_sig"を指定
-csv100 = np.loadtxt("/home/honoka/research/prediction/csv/300_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
-csv200 = np.loadtxt("/home/honoka/research/prediction/csv/500_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
+csv100 = np.loadtxt("/home/honoka/research/prediction/csv/500_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
+csv200 = np.loadtxt("/home/honoka/research/prediction/csv/600_1.csv", delimiter=",", encoding='utf_8_sig',unpack=True)
 csv300 = np.loadtxt("/home/honoka/research/prediction/csv/700_1.csv", delimiter=",", encoding='utf_8_sig', unpack=True)
 
 #時間の行を削除
@@ -46,8 +48,18 @@ for i in range(csv300.shape[0]):
 
 # %%
 #学習できる形に変換
-x = np.array(data)
-x = np.array(data).reshape(600,101,1)
+length_rnn = 10
+sample = length - length_rnn
+#x = np.zeros((sample, length_rnn))
+x = []
+y = []
+#print(data)
+
+for i in range(0,len(data)):
+  for j in range(0,sample):
+    x.append(data[i][j: j + length_rnn])
+
+x = np.array(x).reshape(600,sample, length_rnn)
 t = np.array(target).reshape(len(target), 1)
 t = np_utils.to_categorical(t)
 
@@ -56,13 +68,15 @@ x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=in
 # %%
 #入力、隠れ、出力のユニット数
 l_in = len(x[0])  #301
-l_hidden = 40
+l_hidden = 400
 l_out = 3
 # %%
 #モデルの構築
 model = Sequential()  #入力と出力が１つずつ
-model.add(SimpleRNN(l_hidden,input_shape=(101,1))) #隠れ層のユニット数、活性化関数、入力の形
-model.add(Dense(l_out,activation='softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
+model.add(SimpleRNN(l_hidden,input_shape=(91,10))) #隠れ層のユニット数、活性化関数、入力の形
+#model.add(Flatten())
+model.add(Dense(l_out, activation='softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
+#model.add(Flatten())
 model.summary()
 
 # %%
@@ -73,8 +87,9 @@ model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accu
 
 #%%
 #学習開始
-batch_size = 32
-epochs = 40
+batch_size = 16
+epochs = 100
+print(x_train.shape)
 result = model.fit(x_train,t_train, batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid))
 
 #%%
