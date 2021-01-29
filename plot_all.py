@@ -16,7 +16,7 @@ plt.rcParams["ytick.labelsize"] = 25  # y軸のフォントサイズ
 # データ読み込み
 df = pd.read_csv('/home/honoka/research/prediction/csv/all.csv')
 plt.figure(figsize=(15,10),dpi=700)
-#plt.subplots_adjust(left=1,right=0,bottom=1,top=0)
+
 # 軸ラベル設定
 plt.xlabel("経過時間 [t]",size=30,labelpad=15,fontdict={"fontproperties":font_lavel})
 plt.ylabel("測定電圧 [V]",size=30,labelpad=15,fontdict={"fontproperties": font_lavel})
