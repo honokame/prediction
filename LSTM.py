@@ -8,12 +8,8 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import SimpleRNN
 from keras.layers import LSTM
-from keras.layers import Flatten
 from keras.layers.core import Activation
-from keras.initializers import glorot_normal
-from keras.initializers import he_normal
 from keras.optimizers import Adam
-from keras.optimizers import SGD
 from matplotlib.backends.backend_pdf import PdfPages
 from keras.utils import plot_model
 
@@ -51,18 +47,8 @@ for i in range(csv300.shape[0]):
 
 # %%
 #学習できる形に変換
-length_rnn = 10
-sample = length - length_rnn
-#x = np.zeros((sample, length_rnn))
-x = []
-y = []
-#print(data)
-
-for i in range(0,len(data)):
-  for j in range(0,sample):
-    x.append(data[i][j: j + length_rnn])
-
-x = np.array(x).reshape(600,sample, length_rnn)
+x = np.array(data)
+x = np.array(data).reshape(600,length,1)
 t = np.array(target).reshape(len(target), 1)
 t = np_utils.to_categorical(t)
 
@@ -71,37 +57,32 @@ x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=in
 # %%
 #入力、隠れ、出力のユニット数
 l_in = len(x[0])  #301
-l_hidden = 10
+l_hidden = 3
 l_out = 3
 # %%
 #モデルの構築
 model = Sequential()  #入力と出力が１つずつ
-model.add(SimpleRNN(l_hidden,input_shape=(91,10)))#隠れ層のユニット数、活性化関数、入力の形
-model.add(Dense(l_out, activation='softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
+model.add(SimpleRNN(l_hidden,input_shape=(length,1))) #隠れ層のユニット数、活性化関数、入力の形
+model.add(Dense(l_out,activation='softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
 model.summary()
 
-model1 = Sequential()
-model1.add(SimpleRNN(l_hidden, input_shape=(91, 10)))
-model1.add(Dense(l_out, activation='softmax'))
-model1.summary()
 # %%
 #学習の最適化
-optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)  #後日パラメータ調整
+optimizer = Adam(lr=0.01, beta_1=0.9, beta_2=0.999)  #後日パラメータ調整
 #損失関数（交差エントロピー誤差）、最適化アルゴリズム、評価関数
 model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy']) 
-model1.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy'])
+
 #%%
 #学習開始
 batch_size = 32
-epochs = 300
+epochs = 80
 result = model.fit(x_train,t_train, batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid))
-result1 = model1.fit(x_train,t_train,batch_size=16,epochs=epochs,validation_data=(x_valid,t_valid))
+
 #%%
 #過学習チェック
 pp = PdfPages('rnn_accuracy.pdf')
 plt.plot(range(1, epochs+1), result.history['accuracy'], label="train_acc")
-#plt.plot(range(1, epochs+1), result.history['val_accuracy'], label="valid_acc")
-plt.plot(range(1,epochs+1),result1.history['accuracy'],label="normal")
+plt.plot(range(1, epochs+1), result.history['val_accuracy'], label="valid_acc")
 plt.title('model accuracy')
 plt.xlabel('epoch')
 plt.ylabel('accuracy')
@@ -110,12 +91,12 @@ pp.savefig()
 pp.close()
 
 
+
 # %%
 #学習結果の可視化
 pp = PdfPages('rnn_loss.pdf')
 plt.plot(range(1, epochs+1), result.history['loss'], label="training_loss")
-#plt.plot(range(1, epochs+1), result.history['val_loss'], label="validation_loss")
-plt.plot(range(1,epochs+1),result1.history['loss'],label="normal")
+plt.plot(range(1, epochs+1), result.history['val_loss'], label="validation_loss")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
