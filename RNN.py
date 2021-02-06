@@ -1,9 +1,12 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sb
 
 from keras.utils import np_utils
-from sklearn.model_selection import train_test_split #データセットの分割
+from sklearn.model_selection import train_test_split  #データセットの分割
+from sklearn.metrics import confusion_matrix
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import SimpleRNN
@@ -51,23 +54,17 @@ for i in range(csv300.shape[0]):
 
 # %%
 #学習できる形に変換
-length_rnn = 10
-sample = length - length_rnn
-#x = np.zeros((sample, length_rnn))
-x = []
-y = []
-#print(data)
-
-for i in range(0,len(data)):
-  for j in range(0,sample):
-    x.append(data[i][j: j + length_rnn])
-
-x = np.array(x).reshape(600,sample, length_rnn)
+x = np.array(data)
+x = np.array(data).reshape(len(data),length,1)
 t = np.array(target).reshape(len(target), 1)
 t = np_utils.to_categorical(t)
 
-x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=int(len(data) * 0.2))
-x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=int(len(x_test) * 0.5))
+x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=int(len(data) * 0.2),stratify=t)
+x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=int(len(x_test) * 0.5),stratify=t_test)
+#x_train2, x_test2, t_train2, t_test2 = train_test_split(x[200:399], t[200:399], test_size=int(200 * 0.2))
+#x_valid2, x_test2, t_valid2, t_test2 = train_test_split(x_test2[200:399], t_test2[200:399], test_size=int(len(x_test2)) * 0.5))
+
+
 # %%
 #入力、隠れ、出力のユニット数
 l_in = len(x[0])  #301
@@ -76,32 +73,32 @@ l_out = 3
 # %%
 #モデルの構築
 model = Sequential()  #入力と出力が１つずつ
-model.add(SimpleRNN(l_hidden,input_shape=(91,10)))#隠れ層のユニット数、活性化関数、入力の形
+model.add(SimpleRNN(l_hidden,input_shape=(length,1)))#隠れ層のユニット数、活性化関数、入力の形
 model.add(Dense(l_out, activation='softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
 model.summary()
 
-model1 = Sequential()
-model1.add(SimpleRNN(l_hidden, input_shape=(91, 10)))
-model1.add(Dense(l_out, activation='softmax'))
-model1.summary()
+#model1 = Sequential()
+#model1.add(SimpleRNN(l_hidden, input_shape=(91, 10)))
+#model1.add(Dense(l_out, activation='softmax'))
+#model1.summary()
 # %%
 #学習の最適化
 optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)  #後日パラメータ調整
 #損失関数（交差エントロピー誤差）、最適化アルゴリズム、評価関数
 model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy']) 
-model1.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy'])
+#model1.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy'])
 #%%
 #学習開始
 batch_size = 32
-epochs = 300
+epochs = 100
 result = model.fit(x_train,t_train, batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid))
-result1 = model1.fit(x_train,t_train,batch_size=16,epochs=epochs,validation_data=(x_valid,t_valid))
+#result1 = model1.fit(x_train,t_train,batch_size=16,epochs=epochs,validation_data=(x_valid,t_valid))
 #%%
 #過学習チェック
 pp = PdfPages('rnn_accuracy.pdf')
 plt.plot(range(1, epochs+1), result.history['accuracy'], label="train_acc")
-#plt.plot(range(1, epochs+1), result.history['val_accuracy'], label="valid_acc")
-plt.plot(range(1,epochs+1),result1.history['accuracy'],label="normal")
+plt.plot(range(1, epochs+1), result.history['val_accuracy'], label="valid_acc")
+#plt.plot(range(1,epochs+1),result1.history['accuracy'],label="normal")
 plt.title('model accuracy')
 plt.xlabel('epoch')
 plt.ylabel('accuracy')
@@ -114,8 +111,8 @@ pp.close()
 #学習結果の可視化
 pp = PdfPages('rnn_loss.pdf')
 plt.plot(range(1, epochs+1), result.history['loss'], label="training_loss")
-#plt.plot(range(1, epochs+1), result.history['val_loss'], label="validation_loss")
-plt.plot(range(1,epochs+1),result1.history['loss'],label="normal")
+plt.plot(range(1, epochs+1), result.history['val_loss'], label="validation_loss")
+#plt.plot(range(1,epochs+1),result1.history['loss'],label="normal")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
@@ -146,4 +143,28 @@ print("train_acc=")
 print(count_train / len(score_train))
 print("test_acc=")
 print(count_test / len(score_test))
+
+
+# %%
+print(len(t_test))
+t_test_change = []
+for i in range(60):
+  t_test_change.append(np.argmax(t_test[i]))
+
+predit_classes = model.predict_classes(x_test)
+true_classes = t_test_change
+
+#print(confusion_matrix(true_classes,predit_classes))
+
+def print_mtrix(t_true, t_predict):
+  labels = sorted(list(set(t_true)))
+  mtrix_data = confusion_matrix(t_true, t_predict, labels=labels)
+  
+  df_mtrix = pd.DataFrame(mtrix_data, index=labels, columns=labels)
+  
+  plt.figure(figsize=(12, 7))
+  sb.heatmap(df_mtrix, annot=True, fmt='g', square=True,cmap='Blues')
+  plt.show()
+
+print_mtrix(true_classes,predit_classes)
 # %%
