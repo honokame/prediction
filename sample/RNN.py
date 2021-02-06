@@ -15,9 +15,9 @@ from keras.layers import Dense
 from keras.utils import plot_model
 
 #%%
-csv_double300 = np.loadtxt("/home/honoka/research/prediction/csv/300.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
-csv_double500 = np.loadtxt("/home/honoka/research/prediction/csv/500.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
-csv_double700 = np.loadtxt("/home/honoka/research/prediction/csv/700.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
+csv_double300 = np.loadtxt("/home/honoka/research/prediction/csv_old/300.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
+csv_double500 = np.loadtxt("/home/honoka/research/prediction/csv_old/500.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
+csv_double700 = np.loadtxt("/home/honoka/research/prediction/csv_old/700.csv", dtype="float", delimiter=",", unpack=True, encoding='utf_8_sig')
 
 #BOM付きCSVの場合 encoding='utf_8_sig' を指定する必要がある
 
@@ -46,7 +46,8 @@ for i in range(csv_double700.shape[0]):
 #%%
 X = np.array(data).reshape(len(data), length_partial, 1)
 Y = np.array(target).reshape(len(target), 1)
-
+print(data)
+print(X)
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=int(len(data)*0.2))
 X_valid, X_test, Y_valid, Y_test = train_test_split(X_test, Y_test, test_size=int(len(X_test) * 0.5))
 
@@ -58,6 +59,8 @@ print(len(X[0][0]))
 print(len(Y[0]))
 
 #%%
+print(length_partial)
+print(n_in)
 model = Sequential()
 model.add(SimpleRNN(n_hidden, input_shape=(length_partial, n_in)))
 model.add(Dense(n_out))
