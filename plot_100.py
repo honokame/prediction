@@ -3,17 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager
 font_lavel = matplotlib.font_manager.FontProperties(fname="/usr/share/fonts/truetype/fonts-japanese-mincho.ttf")
-font_memori = matplotlib.font_manager.FontProperties(fname="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf")
-
-
 #%%
 #全体のパラメータ
-plt.rcParams["font.family"] =  "Times New Roman"# フォント
+plt.rcParams["font.family"] =  "Times New Roman" # フォント
 plt.rcParams["xtick.labelsize"] = 25 # x軸のフォントサイズ
 plt.rcParams["ytick.labelsize"] = 25  # y軸のフォントサイズ
-
 #%%
-# データ読み込み
+# データ読み込み、サイズ設定
 df = pd.read_csv('/home/honoka/research/prediction/csv/all.csv')
 plt.figure(figsize=(15,10),dpi=700)
 
@@ -22,17 +18,17 @@ plt.xlabel("経過時間 [t]",size=30,labelpad=15,fontdict={"fontproperties":fon
 plt.ylabel("測定電圧 [V]",size=30,labelpad=15,fontdict={"fontproperties": font_lavel})
 
 # 軸設定
-plt.xlim([0, 1.5])
+plt.xlim([0,1.5]) # 軸範囲
 plt.ylim([0,1.0])
-plt.xticks([0,0.5,1,1.5])
+plt.xticks([0,0.5,1,1.5]) # 軸に表示させる数値
 
-plt.grid()  # グリッド線表示
+#グリッド線表示
+plt.grid()
 
 # x軸データ
 x = df['time']
 
 # y軸データ
-# 100g
 plt.plot(x,df['a1'],c='dodgerblue',lw=2.5)
 plt.plot(x,df['a2'],c='dodgerblue',lw=2.5)
 plt.plot(x,df['a3'],c='dodgerblue',lw=2.5)
@@ -243,8 +239,6 @@ plt.plot(x,df['a197'],c='dodgerblue',lw=2.5)
 plt.plot(x,df['a198'],c='dodgerblue',lw=2.5)
 plt.plot(x,df['a199'],c='dodgerblue',lw=2.5)
 plt.plot(x,df['a200'],c='dodgerblue',lw=2.5)
-
 #%%
 # グラフの保存
-plt.savefig('100g.png')
-# %%
+plt.savefig('/home/honoka/research/prediction/csv/image/100g.png')
