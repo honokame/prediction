@@ -8,14 +8,18 @@ from sklearn.model_selection import train_test_split  #データセットの分�
 from sklearn.metrics import confusion_matrix # 混合行列の計算
 from keras.models import Sequential
 from keras.layers import Dense
-from keras.layers import Bidirectional
+from keras.layers import Bidirectional #双方向
 from keras.layers import LSTM
 from keras.layers import SeqSelfAttention
 from keras.layers import Flatten 
 from keras.layers.core import Activation #活性化関数
 from keras.optimizers import Adam #最適化関数
-from keras.utils import plot_model
+from keras.utils import plot_model #モデル図
 from keras.utils import np_utils
+
+#ハイパーパラメータの調整用
+from sklearn.model_selection import GridSearchCV #これは使う
+from keras.wrappers.scikit_learn import KerasRegressor #これを使うのは間違っていたかもしれない
 #%%
 #csvファイル読み込み
 #BOM付きなのでencoding="utf_8_sig"を指定
@@ -74,6 +78,42 @@ x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=in
 l_in = len(x[0])  #301
 l_hidden = 20
 l_out = 6
+#%%
+#ハイパーパラメータ調整
+#ハイパーパラメータ調整時は、プログラム実行はここまで
+#下の行で構築しているモデルをここで構築する
+"""
+#モデルを定義
+def create_model(lr,l_hidden): #引数は調整したいパラメータ
+  model = Sequential([
+    Bidirectional(LSTM(l_hidden, input_shape=(l_in, 1),return_sequences=True)),
+    SeqSelfAttention(attention_width=l_hidden),
+    Flatten(),
+    Dense(6,activation='softmax')
+  ])
+  #最適化関数と評価関数
+  optimizer = Adam(lr=lr,beta_1=0.9,beta_2=0.999)
+  model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accuracy']) 
+  return model
+
+#調整したいパラメータとその数値
+#これはバッチサイズ、隠れ層の数、学習率
+batch_size = [16,32,64]
+l_hidden = [30,50,70,90]
+lr = [0.01,0.001]
+param_grid = dict(batch_size=batch_size, l_hidden=l_hidden,lr=lr)
+
+#グリッドサーチのモデルとパラメータを定義
+model = KerasRegressor(build_fn=create_model)
+grid = GridSearchCV(estimator=model, param_grid=param_grid)
+
+#一番良いパラメータの組み合わせを総当りで実行
+#エポック数：何回目の学習で評価するか
+grid_result = grid.fit(x_valid,t_valid,epochs=10)
+
+#結果を出力、一番良いパラメータの組み合わせが出力される
+print(grid_result.best_params_)
+"""
 # %%
 #モデルの構築
 #Self-Attentionの時だけsummaryの位置を変えないとエラーが出る
@@ -93,39 +133,35 @@ model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['acc
 batch_size = 32
 epochs = 10
 
-#学習開始時
+#学習開始
 result = model.fit(x_train,t_train,batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid))
 
 model.summary() #モデルの詳細を表示
 plot_model(model,to_file='/home/honoka/research/prediction/result/self-attention/model_self-ttention.png',show_shapes=True) #モデル図
 #%%
-#過学習チェック
-plt.plot(range(1, epochs+1), result.history['accuracy'], label="train_acc")
-plt.plot(range(1, epochs+1), result.history['val_accuracy'], label="valid_acc")
-plt.title('model accuracy')
-plt.xlabel('epoch')
-plt.ylabel('accuracy')
-pp.savefig()
+#正解率の可視化
+plt.figure(dpi=700)
+plt.plot(range(1,epochs+1),result.history['accuracy'],label="train_acc")
+plt.plot(range(1,epochs+1),result.history['val_accuracy'],label="valid_acc")
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.savefig('/home/honoka/research/prediction/self-attention/self-attention_accuracy.png')
+plt.show()
 # %%
-#学習結果の可視化
-pp = PdfPages('rnn_loss.pdf')
-plt.plot(range(1, epochs+1), result.history['loss'], label="training_loss")
-plt.plot(range(1, epochs+1), result.history['val_loss'], label="validation_loss")
+#損失関数の可視化
+plt.figure(dpi=700)
+plt.plot(range(1,epochs+1), result.history['loss'],label="training_loss")
+plt.plot(range(1,epochs+1), result.history['val_loss'],label="validation_loss")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.legend()
-pp.savefig()
-pp.close()
-
-# %%
-#from keras_self_attention import SeqSelfAttention
-
-newmodel = load_model("/home/honoka/research/prediction/modela.h5")
+plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention_loss.png')
+plt.show()
+#%%
 #学習モデルを用いてx_trainから予測
-score_train = newmodel.predict(x_train)
+score_train = model.predict(x_train)
 
 #学習モデルを用いてx_testから予測
-score_test = newmodel.predict(x_test)
+score_test = model.predict(x_test)
 
 #正解率を求める
 count_train = 0
@@ -145,3 +181,27 @@ print(count_train / len(score_train))
 print("test_acc=")
 print(count_test / len(score_test))
 # %%
+#混合行列生成の関数
+def print_mtrix(t_true,t_predict):
+  mtrix_data = confusion_matrix(t_true,t_predict)
+  df_mtrix = pd.DataFrame(mtrix_data, index=['100g','200g','300g','500g','600g','700g'], columns=['100g','200g','300g','500g','600g','700g'])
+  
+  plt.figure(dpi=700)
+  sb.heatmap(df_mtrix,annot=True,fmt='g',square=True,cmap='Blues')
+  plt.title('LSTM')
+  plt.xlabel('Predictit label',fontsize=13)
+  plt.ylabel('True label',fontsize=13)
+  plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention.png')
+  plt.show()
+#%%
+#各データのカウントができないので変形
+t_test_change = []
+for i in range(240):
+  t_test_change.append(np.argmax(t_test[i]))
+
+#混合行列に使用するデータを格納
+predit_classes = model.predict_classes(x_test)
+true_classes = t_test_change
+
+#混合行列生成
+print_mtrix(true_classes,predit_classes)

@@ -12,7 +12,7 @@ from keras.layers import SimpleRNN
 from keras.layers.core import Activation #活性化関数
 from keras.optimizers import Adam #最適化関数
 from keras.utils import plot_model
-from keras.utils import np_utils
+from keras.utils import np_utils #モデル図
 
 #%%
 #csvファイル読み込み
