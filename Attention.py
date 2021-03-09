@@ -122,10 +122,10 @@ model.add(Bidirectional(LSTM(l_hidden,input_shape=(l_in,1),return_sequences=True
 model.add(SeqSelfAttention(attention_width=15)) #Self-Attentionの隠れ層のノード数
 model.add(Flatten()) #次元を変換
 model.add(Dense(l_out))  #出力層を追加
-model.add(Activation('softmax')) #多クラス分類なのでソフトマックス関数、シグモイドも試す？
+model.add(Activation('softmax')) #多クラス分類なのでソフトマックス関数
 #%%
 ##学習の最適化
-optimizer = Adam(lr=0.01,beta_1=0.9,beta_2=0.999)  #後日パラメータ調整
+optimizer = Adam(lr=0.01,beta_1=0.9,beta_2=0.999)  
 #損失関数（交差エントロピー誤差）、最適化関数、評価関数
 model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
 
