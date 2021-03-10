@@ -10,8 +10,8 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Bidirectional #双方向
 from keras.layers import LSTM
-from keras.layers import SeqSelfAttention
-from keras.layers import Flatten 
+from keras.layers import Flatten
+from keras_self_attention import SeqSelfAttention
 from keras.layers.core import Activation #活性化関数
 from keras.optimizers import Adam #最適化関数
 from keras.utils import plot_model #モデル図
@@ -66,16 +66,16 @@ for i in range(csv700.shape[0]):
 # %%
 #kerasで学習できる形に変換
 #リストから配列に変換
-x = np.array(data).reshape(600,length,1)
+x = np.array(data).reshape(len(data),length,1)
 t = np.array(target).reshape(len(target), 1)
 t = np_utils.to_categorical(t) #教師データをone-hot表現に変換
 
 #訓練データ、検証データ、テストデータに分割
-x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=int(len(data) * 0.2))
+x_train, x_test, t_train, t_test = train_test_split(x, t, test_size=int(len(data) * 0.4),stratify=t)
 x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=int(len(x_test) * 0.5))
 # %%
 #入力、隠れ、出力のノード数
-l_in = len(x[0])  #301
+l_in = len(x[0])  #101
 l_hidden = 20
 l_out = 6
 #%%
@@ -131,13 +131,13 @@ model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['acc
 
 #バッチサイズ、エポック数
 batch_size = 32
-epochs = 10
+epochs = 50
 
 #学習開始
 result = model.fit(x_train,t_train,batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid))
 
 model.summary() #モデルの詳細を表示
-plot_model(model,to_file='/home/honoka/research/prediction/result/self-attention/model_self-ttention.png',show_shapes=True) #モデル図
+plot_model(model,to_file='/home/honoka/research/prediction/result/self-attention/model_self-attention1.png',show_shapes=True) #モデル図
 #%%
 #正解率の可視化
 plt.figure(dpi=700)
@@ -145,7 +145,7 @@ plt.plot(range(1,epochs+1),result.history['accuracy'],label="train_acc")
 plt.plot(range(1,epochs+1),result.history['val_accuracy'],label="valid_acc")
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
-plt.savefig('/home/honoka/research/prediction/self-attention/self-attention_accuracy.png')
+plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention_accuracy1.png')
 plt.show()
 # %%
 #損失関数の可視化
@@ -154,7 +154,7 @@ plt.plot(range(1,epochs+1), result.history['loss'],label="training_loss")
 plt.plot(range(1,epochs+1), result.history['val_loss'],label="validation_loss")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention_loss.png')
+plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention_loss1.png')
 plt.show()
 #%%
 #学習モデルを用いてx_trainから予測
@@ -191,7 +191,7 @@ def print_mtrix(t_true,t_predict):
   plt.title('LSTM')
   plt.xlabel('Predictit label',fontsize=13)
   plt.ylabel('True label',fontsize=13)
-  plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention.png')
+  plt.savefig('/home/honoka/research/prediction/result/self-attention/self-attention11.png')
   plt.show()
 #%%
 #各データのカウントができないので変形
