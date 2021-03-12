@@ -70,7 +70,7 @@ x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=in
 # %%
 #入力、隠れ、出力のノード数
 l_in = len(x[0])
-l_hidden = 10
+l_hidden = 50
 l_out = 6
 # %%
 #モデルの構築
@@ -79,7 +79,7 @@ model.add(LSTM(l_hidden,input_shape=(l_in,1))) #隠れ層のノード数、入�
 model.add(Dense(l_out)) # 出力層を追加
 model.add(Activation('softmax')) #多クラス分類なのでソフトマックス関数
 model.summary() #モデルの詳細を表示
-plot_model(model,to_file='/home/honoka/research/prediction/result/lstm/model_rnn10.png',show_shapes=True) #モデル図
+plot_model(model,to_file='/home/honoka/research/prediction/result/lstm/model_rnn1.png',show_shapes=True) #モデル図
 #%%
 #学習の最適化関数を設定
 optimizer = Adam(lr=0.01,beta_1=0.9,beta_2=0.999)  
@@ -89,7 +89,7 @@ model.compile(loss='categorical_crossentropy',optimizer=optimizer,metrics=['accu
 #学習開始
 #バッチサイズ、エポック数
 batch_size = 16
-epochs = 100
+epochs = 70
 result = model.fit(x_train,t_train,batch_size=batch_size,epochs=epochs,validation_data=(x_valid, t_valid),verbose=2)
 #%%
 #正解率の可視化
@@ -98,7 +98,7 @@ plt.plot(range(1,epochs+1),result.history['accuracy'],label="train_acc")
 plt.plot(range(1,epochs+1),result.history['val_accuracy'],label="valid_acc")
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
-plt.savefig('/home/honoka/research/prediction/lstm/lstm_accuracy.png')
+plt.savefig('/home/honoka/research/prediction/result/lstm/lstm_accuracy1.png')
 plt.show()
 # %%
 #損失関数の可視化
@@ -107,7 +107,7 @@ plt.plot(range(1,epochs+1), result.history['loss'],label="training_loss")
 plt.plot(range(1,epochs+1), result.history['val_loss'],label="validation_loss")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.savefig('/home/honoka/research/prediction/result/lstm/lstm_loss.png')
+plt.savefig('/home/honoka/research/prediction/result/lstm/lstm_loss1.png')
 plt.show()
 # %%
 #学習モデルを用いてx_trainから予測
@@ -143,7 +143,7 @@ def print_mtrix(t_true,t_predict):
   plt.title('LSTM')
   plt.xlabel('Predictit label',fontsize=13)
   plt.ylabel('True label',fontsize=13)
-  plt.savefig('/home/honoka/research/prediction/result/lstm/lstm.png')
+  plt.savefig('/home/honoka/research/prediction/result/lstm/lstm11.png')
   plt.show()
 #%%
 #各データのカウントができないので変形

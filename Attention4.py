@@ -10,8 +10,8 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Bidirectional #双方向
 from keras.layers import LSTM
-from keras.layers import SeqSelfAttention
-from keras.layers import Flatten 
+from keras.layers import Flatten
+from keras_self_attention import SeqSelfAttention 
 from keras.layers.core import Activation #活性化関数
 from keras.optimizers import Adam #最適化関数
 from keras.utils import plot_model #モデル図
@@ -120,7 +120,7 @@ def print_mtrix(t_true,t_predict):
   sb.heatmap(df_mtrix, annot=True,fmt='g',square=True,cmap='Blues')
   plt.xlabel('Predictit label',fontsize=13)
   plt.ylabel('True label',fontsize=13)
-  plt.savefig('/home/honoka/research/prediction/result/p1/1.png')
+  plt.savefig('/home/honoka/research/prediction/result/p4/6.png')
   plt.show()
 #%%
 #各データのカウントができないので変形

@@ -79,7 +79,7 @@ model.add(SimpleRNN(l_hidden,input_shape=(l_in,1))) #隠れ層のノード数、
 model.add(Dense(l_out)) # 出力層を追加
 model.add(Activation('softmax')) #多クラス分類なのでソフトマックス関数
 model.summary() #モデルの詳細を表示
-plot_model(model,to_file='/home/honoka/research/prediction/result/rnn/model_rnn10.png',show_shapes=True) #モデル図
+plot_model(model,to_file='/home/honoka/research/prediction/result/rnn/model_rnn1.png',show_shapes=True) #モデル図
 #%%
 #学習の最適化関数を設定
 optimizer = Adam(lr=0.01,beta_1=0.9,beta_2=0.999)  
@@ -98,7 +98,7 @@ plt.plot(range(1,epochs+1),result.history['accuracy'],label="train_acc")
 plt.plot(range(1,epochs+1),result.history['val_accuracy'],label="valid_acc")
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
-plt.savefig('/home/honoka/research/prediction/rnn/rnn_accuracy.png')
+plt.savefig('/home/honoka/research/prediction/result/rnn/rnn_accuracy1.png')
 plt.show()
 # %%
 #損失関数の可視化
@@ -107,7 +107,7 @@ plt.plot(range(1,epochs+1), result.history['loss'],label="training_loss")
 plt.plot(range(1,epochs+1), result.history['val_loss'],label="validation_loss")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.savefig('/home/honoka/research/prediction/result/rnn/rnn_loss.png')
+plt.savefig('/home/honoka/research/prediction/result/rnn/rnn_loss1.png')
 plt.show()
 # %%
 #学習モデルを用いてx_trainから予測

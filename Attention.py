@@ -76,13 +76,13 @@ x_valid, x_test, t_valid, t_test = train_test_split(x_test, t_test, test_size=in
 # %%
 #入力、隠れ、出力のノード数
 l_in = len(x[0])  #101
-l_hidden = 20
+l_hidden = 30
 l_out = 6
 #%%
 #ハイパーパラメータ調整
 #ハイパーパラメータ調整時は、プログラム実行はここまで
 #下の行で構築しているモデルをここで構築する
-"""
+
 #モデルを定義
 def create_model(lr,l_hidden): #引数は調整したいパラメータ
   model = Sequential([
@@ -98,9 +98,9 @@ def create_model(lr,l_hidden): #引数は調整したいパラメータ
 
 #調整したいパラメータとその数値
 #これはバッチサイズ、隠れ層の数、学習率
-batch_size = [16,32,64]
-l_hidden = [30,50,70,90]
-lr = [0.01,0.001]
+batch_size = [16]
+l_hidden = [30,50]
+lr = [0.01]
 param_grid = dict(batch_size=batch_size, l_hidden=l_hidden,lr=lr)
 
 #グリッドサーチのモデルとパラメータを定義
@@ -108,12 +108,11 @@ model = KerasRegressor(build_fn=create_model)
 grid = GridSearchCV(estimator=model, param_grid=param_grid)
 
 #一番良いパラメータの組み合わせを総当りで実行
-#エポック数：何回目の学習で評価するか
-grid_result = grid.fit(x_valid,t_valid,epochs=10)
+#エポック数：何回目の学習で評価するか:
+grid_result = grid.fit(x_valid,t_valid,epochs=1)
 
 #結果を出力、一番良いパラメータの組み合わせが出力される
 print(grid_result.best_params_)
-"""
 # %%
 #モデルの構築
 #Self-Attentionの時だけsummaryの位置を変えないとエラーが出る
